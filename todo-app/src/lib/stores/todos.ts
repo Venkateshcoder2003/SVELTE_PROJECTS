@@ -1,3 +1,4 @@
+//Svelte store for managing all todo-related operations
 import { writable } from "svelte/store";
 import {
   collection,
@@ -19,41 +20,41 @@ import {
   deleteObject,
 } from "firebase/storage";
 import { db, storage } from "../utils/firebase";
-import type { Todo } from "../types";
+import type { Todo } from "../models";
 import { toast } from "svelte-sonner";
 
-// Create writable store for todos array
+//Stores the main array of todo items
 export const todosStore = writable<Todo[]>([]);
 
-// Create writable store for loading state
+//Stores the loading state (true when fetching data)
 export const todosLoading = writable<boolean>(false);
 
-// Create writable store for error messages
+//Stores any error messages
 export const todosError = writable<string | null>(null);
 
-// Variable to store Firestore unsubscribe function
+//Holds the function to stop the Firestore listener
 let unsubscribe: Unsubscribe | null = null;
 
-// Function to start listening to user's todos
+//Function to start listening to user's todos
 export const subscribeTodos = (userId: string): void => {
-  // Set loading state
+  //Set initial state for loading and error
   todosLoading.set(true);
   todosError.set(null);
 
-  // Create query to get todos for specific user, ordered by creation date
+  //Create a query to get todos for the specified user, ordered by newest first
   const q = query(
     collection(db, "todos"),
     where("userId", "==", userId),
     orderBy("createdAt", "desc")
   );
 
-  // Listen for real-time updates
+  //onSnapshot listens for any changes to the query results in real-time
   unsubscribe = onSnapshot(
     q,
     (querySnapshot) => {
       const todos: Todo[] = [];
 
-      // Convert Firestore documents to Todo objects
+      //Loop through each document from Firestore and convert it to a Todo object
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         todos.push({
@@ -67,12 +68,12 @@ export const subscribeTodos = (userId: string): void => {
         });
       });
 
-      // Update store with new todos
+      //Update the Svelte store with the fresh list of todos
       todosStore.set(todos);
       todosLoading.set(false);
     },
     (error) => {
-      // Handle any errors
+      //Handle any errors during fetching
       console.error("Error fetching todos:", error);
       todosError.set(error.message);
       todosLoading.set(false);
@@ -80,17 +81,17 @@ export const subscribeTodos = (userId: string): void => {
   );
 };
 
-// Function to stop listening to todos (cleanup)
+//Stops the real-time listener to prevent memory leaks when the user logs out
 export const unsubscribeTodos = (): void => {
   if (unsubscribe) {
-    unsubscribe(); // Stop listening
+    unsubscribe(); //Call the function to stop listening
     unsubscribe = null;
   }
-  // Clear todos when user logs out
+  //Clear the local todos array
   todosStore.set([]);
 };
 
-// Function to add a new todo
+//Function to add a new todo
 export const addTodo = async (
   text: string,
   userId: string,
@@ -100,18 +101,19 @@ export const addTodo = async (
   try {
     todosError.set(null);
 
-    // Validate todo text length (max 250 characters as per requirements)
+    //Validate todo text length (MAXLENGTH = 250)
     if (text.length > 250) {
       todosError.set("Todo text cannot be longer than 250 characters");
       return false;
     }
 
-    // Validate that text is not empty
+    //Validate that text is not empty
     if (text.trim() === "") {
       todosError.set("Todo text cannot be empty");
       return false;
     }
 
+    //Create the base object for the new todo
     const newTodoData: any = {
       text: text.trim(),
       completed: false,
@@ -119,6 +121,7 @@ export const addTodo = async (
       userId: userId,
     };
 
+    //If an image file is provided, upload it to Firebase Storage
     if (imageFile) {
       const imageRef = ref(
         storage,
@@ -128,6 +131,7 @@ export const addTodo = async (
       newTodoData.imageUrl = await getDownloadURL(imageRef);
     }
 
+    //If a video file is provided, upload it to Firebase Storage
     if (videoFile) {
       const videoRef = ref(
         storage,
@@ -136,68 +140,68 @@ export const addTodo = async (
       await uploadBytes(videoRef, videoFile);
       newTodoData.videoUrl = await getDownloadURL(videoRef);
     }
-    // Add new todo to Firestore
+    //Add new todo to Firestore
     await addDoc(collection(db, "todos"), newTodoData);
     toast.success("Todo added successfully!");
 
-    return true; // Success
+    return true; //Success
   } catch (error: any) {
     console.error("Error adding todo:", error);
     todosError.set(error.message);
-    return false; // Failed
+    return false; //Failed to add Todo
   }
 };
 
-// Function to toggle todo completion status
+//Function to toggle todo completion status
 export const toggleTodo = async (todoId: string): Promise<boolean> => {
   try {
     todosError.set(null);
 
-    // Get current todos to find the one to toggle
+    //Get current todos to find the one to toggle
     let currentTodos: Todo[] = [];
     todosStore.subscribe((todos) => (currentTodos = todos))();
 
-    // Find the todo to toggle
+    //Find the todo to toggle
     const todoToToggle = currentTodos.find((todo) => todo.id === todoId);
     if (!todoToToggle) {
       todosError.set("Todo not found");
       return false;
     }
 
-    // Update the todo in Firestore
+    //Update the todo in Firestore
     const todoRef = doc(db, "todos", todoId);
     await updateDoc(todoRef, {
       completed: !todoToToggle.completed,
     });
 
-    return true; // Success
+    return true;
   } catch (error: any) {
     console.error("Error toggling todo:", error);
     todosError.set(error.message);
-    return false; // Failed
+    return false;
   }
 };
 
-// Function to delete a todo
+//Deletes a todo and any associated files from Firebase
 export const deleteTodo = async (todoId: string): Promise<boolean> => {
   try {
     todosError.set(null);
 
-    // Get the todo to find file URLs before deleting the document
+    //Get the todo to find file URLs before deleting the document
     let todoToDelete: Todo | undefined;
     todosStore.subscribe((todos) => {
       todoToDelete = todos.find((t) => t.id === todoId);
     })();
 
     if (todoToDelete) {
-      // Delete image from storage if it exists
+      //If an image URL exists, delete it file from Storage
       if (todoToDelete.imageUrl) {
         const imageRef = ref(storage, todoToDelete.imageUrl);
         await deleteObject(imageRef).catch((err) =>
           console.error("Error deleting image:", err)
         );
       }
-      // Delete video from storage if it exists
+      //Delete video from storage if it exists
       if (todoToDelete.videoUrl) {
         const videoRef = ref(storage, todoToDelete.videoUrl);
         await deleteObject(videoRef).catch((err) =>
@@ -206,7 +210,7 @@ export const deleteTodo = async (todoId: string): Promise<boolean> => {
       }
     }
 
-    // Delete todo document from Firestore
+    //Delete todo document from Firestore
     await deleteDoc(doc(db, "todos", todoId));
     toast.success("Todo deleted Successfully");
 
@@ -218,7 +222,7 @@ export const deleteTodo = async (todoId: string): Promise<boolean> => {
   }
 };
 
-// Function to update todo text
+//Function to update todo text
 export const updateTodo = async (
   todoId: string,
   newText: string
@@ -226,28 +230,28 @@ export const updateTodo = async (
   try {
     todosError.set(null);
 
-    // Validate todo text length
+    //Validate todo text length
     if (newText.length > 250) {
       todosError.set("Todo text cannot be longer than 250 characters");
       return false;
     }
 
-    // Validate that text is not empty
+    //Validate that text is not empty
     if (newText.trim() === "") {
       todosError.set("Todo text cannot be empty");
       return false;
     }
 
-    // Update todo in Firestore
+    //Update todo in Firestore
     const todoRef = doc(db, "todos", todoId);
     await updateDoc(todoRef, {
       text: newText.trim(),
     });
 
-    return true; // Success
+    return true;
   } catch (error: any) {
     console.error("Error updating todo:", error);
     todosError.set(error.message);
-    return false; // Failed
+    return false;
   }
 };

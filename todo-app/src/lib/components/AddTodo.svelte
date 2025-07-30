@@ -1,25 +1,23 @@
 <!-- Component for adding new todos -->
-<!-- Includes form validation and character count -->
-
 <script lang="ts">
-  // Import necessary modules
+  //Import necessary modules
   import { authStore } from '$lib/stores/auth';
   import { addTodo, todosError } from '$lib/stores/todos';
   
-  // Form state variables
-  let todoText = ''; // Text input value
-  let isSubmitting = false; // Loading state for form submission
-  let localError = ''; // Local validation error messages
+  //Form state variables
+  let todoText = ''; //Text input value
+  let isSubmitting = false; //Loading state for form submission
+  let localError = ''; //Local validation error messages
   let imageFile: File | null = null;
   let videoFile: File | null = null;
   
-  // Maximum character limit for todos (as per requirements)
+  //Maximum character limit for todos (as per requirements)
   const MAX_CHARACTERS = 250;
   
-  // Reactive statement to calculate remaining characters
+  //Reactive statement to calculate remaining characters
   $: remainingChars = MAX_CHARACTERS - todoText.length;
   
-  // Reactive statement to check if input is valid
+  //Reactive statement to check if input is valid
   $: isValidInput = todoText.trim().length > 0 && todoText.length <= MAX_CHARACTERS;
   
    function handleFileSelect(event: Event, type: 'image' | 'video') {
@@ -32,15 +30,15 @@
     }
   }
 
-  // Function to handle form submission
+  //Function to handle form submission
   async function handleSubmit() {
-    // Prevent multiple submissions
+    //Prevent multiple submissions
     if (isSubmitting) return;
     
-    // Clear any previous local errors
+    //Clear any previous local errors
     localError = '';
     
-    // Validate input
+    //Validate input
     if (!todoText.trim()) {
       localError = 'Please enter a todo text';
       return;
@@ -51,26 +49,26 @@
       return;
     }
     
-    // Check if user is authenticated
+    //Check if user is authenticated
     if (!$authStore.user) {
       localError = 'You must be logged in to add todos';
       return;
     }
     
-    // Set loading state
+    //Set loading state
     isSubmitting = true;
     
-    // Attempt to add the todo
-     const success = await addTodo(todoText, $authStore.user.uid, imageFile, videoFile);
+    //Attempt to add the todo
+    const success = await addTodo(todoText, $authStore.user.uid, imageFile, videoFile);
     
-    // Reset loading state
+    //Reset loading state
     isSubmitting = false;
     
-    // Clear form if successful
+    //Clear form if successful
     if (success) {
       todoText = ''; // Clear the input field
       localError = '';
-       imageFile = null;
+      imageFile = null;
       videoFile = null;
       const form = document.querySelector('form');
       form?.reset(); 
@@ -86,7 +84,7 @@
     }
   }
   
-  // Function to handle input changes and validate
+  //Function to handle input changes and validate
   function handleInput(event: Event) {
     const target = event.target as HTMLTextAreaElement;
     todoText = target.value;

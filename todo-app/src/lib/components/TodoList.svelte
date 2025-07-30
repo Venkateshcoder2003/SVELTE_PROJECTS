@@ -1,11 +1,8 @@
-<!-- Component for displaying list of todos -->
-<!-- Shows all todos with filtering and sorting options -->
-
 <script lang="ts">
-  // Import necessary modules
+  //Import necessary modules
   import { todosStore } from '$lib/stores/todos';
   import TodoItem from './TodoItem.svelte';
-  import type { Todo } from '$lib/types';
+  import type { Todo } from '$lib/models';
   
   // Filter state variables
   let filterType: 'all' | 'completed' | 'pending' = 'all';

@@ -1,15 +1,12 @@
-<!-- Navigation component for authenticated users -->
-<!-- Displays user info and logout functionality -->
-
 <script lang="ts">
-  // Import necessary modules
+  //Import necessary modules
   import { goto } from '$app/navigation';
   import { authStore, signOutUser } from '$lib/stores/auth';
   
-  // Function to handle user logout
+  //Function to handle user logout
   async function handleLogout() {
-    await signOutUser(); // Sign out user
-    goto('/'); // Redirect to home page
+    await signOutUser(); //Sign out user
+    goto('/'); //Redirect user to home page
   }
 </script>
 

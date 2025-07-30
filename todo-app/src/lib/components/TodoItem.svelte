@@ -1,56 +1,57 @@
 <script lang="ts">
-  // Import necessary modules
+  //Import necessary modules
   import { toggleTodo, deleteTodo, updateTodo } from '$lib/stores/todos';
   import type { Todo } from '$lib/types';
+  import { toast } from "svelte-sonner";
+  import ConfirmDialog from './ConfirmDialog.svelte'; 
+
+
+  export let todo: Todo; //The todo object to display
   
-  // Props
-  export let todo: Todo; // The todo object to display
+  //Component state variables
+  let isEditing = false;
+  let editText = todo.text;
+  let isToggling = false;
+  let isDeleting = false;
+  let isUpdating = false;
+  let editError = '';
+  let showConfirmDialog = false; 
   
-  // Component state variables
-  let isEditing = false; // Whether the todo is in edit mode
-  let editText = todo.text; // Text being edited
-  let isToggling = false; // Loading state for toggle operation
-  let isDeleting = false; // Loading state for delete operation
-  let isUpdating = false; // Loading state for update operation
-  let editError = ''; // Error message for editing
-  
-  // Maximum character limit for todos
+  //Maximum character limit for todos
   const MAX_CHARACTERS = 250;
   
-  // Reactive statement to calculate remaining characters while editing
+  //Reactive statement to calculate remaining characters while editing
   $: remainingChars = MAX_CHARACTERS - editText.length;
   
-  // Function to handle todo completion toggle
+  //Function to handle todo completion toggle
   async function handleToggle() {
-    if (isToggling) return; // Prevent multiple clicks
+    if (isToggling) return;
     
     isToggling = true;
-    // NOTE: You might want to pass the current status to simplify the store logic
-    // const success = await toggleTodo(todo.id, todo.completed);
     const success = await toggleTodo(todo.id);
     isToggling = false;
     
     if (!success) {
-      // Error is handled by the store, just log for debugging
-      console.error('Failed to toggle todo');
+      toast.error("Failed to toggle todo");
     }
   }
   
-  // Function to handle todo deletion
-  async function handleDelete() {
-    if (isDeleting) return; // Prevent multiple clicks
-    
-    // Ask for confirmation before deleting
-    if (!confirm('Are you sure you want to delete this todo?')) {
-      return;
-    }
-    
+  //This function now just OPENS the dialog
+  function handleDelete() {
+    if (isDeleting) return;
+    showConfirmDialog = true;
+  }
+
+  //This new function runs AFTER the user confirms
+  async function executeDelete() {
+    if (isDeleting) return;
+
     isDeleting = true;
     const success = await deleteTodo(todo.id);
     isDeleting = false;
     
     if (!success) {
-      // Error is handled by the store, just log for debugging
+      //Error is handled by the store, just log for debugging
       console.error('Failed to delete todo');
     }
   }
@@ -58,25 +59,23 @@
   // Function to start editing mode
   function startEditing() {
     isEditing = true;
-    editText = todo.text; // Reset edit text to current todo text
-    editError = ''; // Clear any previous errors
+    editText = todo.text;
+    editError = '';
   }
   
   // Function to cancel editing
   function cancelEditing() {
     isEditing = false;
-    editText = todo.text; // Reset to original text
-    editError = ''; // Clear any errors
+    editText = todo.text;
+    editError = '';
   }
   
   // Function to save edited todo
   async function saveEdit() {
-    if (isUpdating) return; // Prevent multiple submissions
+    if (isUpdating) return;
     
-    // Clear previous errors
     editError = '';
     
-    // Validate input
     if (!editText.trim()) {
       editError = 'Todo text cannot be empty';
       return;
@@ -87,7 +86,6 @@
       return;
     }
     
-    // Don't update if nothing changed
     if (editText.trim() === todo.text) {
       isEditing = false;
       return;
@@ -98,13 +96,12 @@
     isUpdating = false;
     
     if (success) {
-      isEditing = false; // Exit edit mode
-      editError = ''; // Clear any errors
+      isEditing = false;
+      editError = '';
     }
-    // Error messages from the store will be displayed elsewhere
   }
   
-  // Function to handle Enter key press while editing
+  //Function to handle Enter key press while editing
   function handleKeyPress(event: KeyboardEvent) {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
@@ -114,33 +111,31 @@
     }
   }
   
-  // Function to format date for display
+  //Function to format date for display
   function formatDate(date: Date): string {
     const now = new Date();
     const diffTime = now.getTime() - date.getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
     if (diffDays === 0) {
-      // Today - show time
-      return date.toLocaleTimeString('en-US', { 
-        hour: 'numeric', 
-        minute: '2-digit',
-        hour12: true 
-      });
+      return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
     } else if (diffDays === 1) {
       return 'Yesterday';
     } else if (diffDays < 7) {
       return `${diffDays} days ago`;
     } else {
-      // Show date
-      return date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-      });
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
     }
   }
 </script>
+
+<ConfirmDialog 
+  bind:show={showConfirmDialog}
+  title="Delete Todo"
+  message="Are you sure you want to delete this todo? This cannot be undone."
+  on:confirm={executeDelete}
+  on:cancel={() => showConfirmDialog = false}
+/>
 
 <div 
   class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200"

@@ -1,42 +1,40 @@
-<!-- Login page component -->
-<!-- Handles user authentication with email and password -->
-
 <script lang="ts">
-  // Import necessary modules
+  //Import necessary modules
   import { goto } from '$app/navigation';
   import { authStore, signIn } from '$lib/stores/auth';
   import type { LoginForm } from '$lib/types';
-  
-  // Form data object
+  import { toast } from "svelte-sonner";
+  //Form data object
   let formData: LoginForm = {
     email: '',
     password: ''
   };
   
-  // Local loading state for form submission
+  //Local loading state for form submission
   let isSubmitting = false;
   
-  // Function to handle form submission
+  //Function to handle form submission
   async function handleSubmit() {
-    // Prevent multiple submissions
+    //Prevent multiple submissions
     if (isSubmitting) return;
     
-    // Basic form validation
+    //form validation
     if (!formData.email || !formData.password) {
-      return; // Don't submit if fields are empty
+      return; //Don't submit if fields are empty
     }
     
-    // Set loading state
+    //Set loading state to true
     isSubmitting = true;
     
     // Attempt to sign in user
     const success = await signIn(formData.email, formData.password);
     
-    // Reset loading state
+    //Reset loading state to false
     isSubmitting = false;
     
     // Redirect to dashboard if successful
     if (success) {
+      toast.success("Login Successful");
       goto('/dashboard');
     }
     // Error message will be shown automatically from the store

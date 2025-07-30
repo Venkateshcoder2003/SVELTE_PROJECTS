@@ -1,8 +1,5 @@
 <script lang="ts">
-  // Import global CSS styles
   import '../app.css';
-
-  // Import navigation component
   import Navigation from '$lib/components/Navigation.svelte';
 
   // Import authentication store
