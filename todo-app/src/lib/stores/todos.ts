@@ -142,7 +142,7 @@ export const addTodo = async (
     }
     //Add new todo to Firestore
     await addDoc(collection(db, "todos"), newTodoData);
-    toast.success("Todo added successfully!");
+    toast.success(`${newTodoData.text} Todo added successfully!`);
 
     return true; //Success
   } catch (error: any) {
@@ -247,7 +247,8 @@ export const updateTodo = async (
     await updateDoc(todoRef, {
       text: newText.trim(),
     });
-
+    toast.success("Todo Update Successfully"); 
+   
     return true;
   } catch (error: any) {
     console.error("Error updating todo:", error);
