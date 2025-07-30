@@ -6,10 +6,12 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   type User as FirebaseUser,
 } from "firebase/auth";
 import { auth } from "../utils/firebase"; //Importing Firebase auth instance configured in our project
 import type { User, AuthState } from "../models";
+import { toast } from "svelte-sonner";
 
 //Initial authentication state
 const initialState: AuthState = {
@@ -109,6 +111,26 @@ export const signOutUser = async (): Promise<void> => {
       ...state,
       error: error.message,
     }));
+  }
+};
+
+export const forgotPassword = async (email: string): Promise<boolean> => {
+  if (!email) {
+    toast.error("Please enter your email address.");
+    return false;
+  }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    toast.success("Password reset email sent! Please check your inbox or Spam.");
+    return true;
+  } catch (error: any) {
+
+    let message = "Failed to send password reset email.";
+    if (error.code === "auth/user-not-found") {
+      message = "No account found with that email address.";
+    }
+    toast.error(message);
+    return false;
   }
 };
 

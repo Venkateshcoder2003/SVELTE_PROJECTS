@@ -1,5 +1,3 @@
-<!-- Dashboard page - protected route for authenticated users -->
-<!-- Main todo management interface -->
 <script lang="ts">
   // Import necessary modules
   import { onMount, onDestroy } from 'svelte';
@@ -58,6 +56,7 @@
 <!-- Show dashboard for authenticated users -->
 {:else if $authStore.user}
   <div class="max-w-4xl mx-auto">
+    <!-- Dashboard header -->
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 class="text-3xl font-bold text-gray-800">
@@ -70,8 +69,8 @@
     </div>
     
     <!-- Add new todo section -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-      <h2 class="text-xl font-semibold text-gray-800 mb-4">
+    <div class="bg-slate-50 rounded-lg shadow-md p-6 mb-6 border border-slate-200">
+      <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-3 border-b border-slate-200">
         Add New Todo
       </h2>
       <AddTodo />
@@ -85,8 +84,8 @@
     {/if}
     
     <!-- Todos list section -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <div class="flex justify-between items-center mb-4">
+    <div class="bg-slate-50 rounded-lg shadow-md p-6 border border-slate-200">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200">
         <h2 class="text-xl font-semibold text-gray-800">
           Your Todos
         </h2>
@@ -111,7 +110,8 @@
         <TodoList />
       {/if}
     </div>
-
+    
+    <!-- Quick stats section -->
     {#if !$todosLoading && $todosStore.length > 0}
       <div class="mt-6 grid grid-cols-3 gap-2 sm:gap-4">
         <!-- Total todos -->

@@ -6,7 +6,7 @@
   import ConfirmDialog from './ConfirmDialog.svelte';
   import AttachmentIcon from './AttachmentIcon.svelte';
 
-  //Prop
+  // Props
   export let todo: Todo;
 
   // Component state variables
@@ -17,7 +17,10 @@
   let isUpdating = false;
   let editError = '';
   let showConfirmDialog = false;
-  let showAttachments = false;
+  
+  // UPDATED: Separate state for each attachment
+  let showImage = false;
+  let showVideo = false;
   
   let editImageFile: File | null = null;
   let editVideoFile: File | null = null;
@@ -66,7 +69,9 @@
     editError = '';
     editImageFile = null;
     editVideoFile = null;
-    showAttachments = false;
+    // Hide any open attachments when editing starts
+    showImage = false;
+    showVideo = false;
   }
 
   function cancelEditing() {
@@ -193,10 +198,8 @@
         </div>
       </div>
       
-      <!-- This div pushes the buttons to the bottom -->
       <div class="flex-grow"></div>
 
-      <!-- Character count, errors, and action buttons -->
       <div class="flex justify-between items-center mt-1">
         <div class="text-xs text-gray-500">
           Enter to save, Esc to cancel
@@ -265,16 +268,17 @@
         </div>
       </div>
       
-      {#if showAttachments}
-        <div class="mt-3 space-y-3 flex-grow w-full">
-          {#if todo.imageUrl}
-            <img src={todo.imageUrl} alt="Todo attachment" class="rounded-lg max-h-60 w-full object-cover" />
-          {/if}
-          {#if todo.videoUrl}
-            <video src={todo.videoUrl} controls class="rounded-lg w-full">
-              <track kind="captions" />
-            </video>
-          {/if}
+      <!-- UPDATED: Separate conditional blocks for image and video -->
+      {#if showImage && todo.imageUrl}
+        <div class="mt-3 flex-grow w-full">
+          <img src={todo.imageUrl} alt="Todo attachment" class="rounded-lg max-h-60 w-full object-cover" />
+        </div>
+      {/if}
+      {#if showVideo && todo.videoUrl}
+        <div class="mt-3 flex-grow w-full">
+          <video src={todo.videoUrl} controls class="rounded-lg w-full">
+            <track kind="captions" />
+          </video>
         </div>
       {/if}
 
@@ -282,11 +286,12 @@
 
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2 w-full gap-2">
         <div class="flex items-center gap-2">
+          <!-- UPDATED: Each icon now toggles its own state variable -->
           {#if todo.imageUrl}
-            <AttachmentIcon type="image" on:click={() => showAttachments = !showAttachments} />
+            <AttachmentIcon type="image" on:click={() => showImage = !showImage} />
           {/if}
           {#if todo.videoUrl}
-            <AttachmentIcon type="video" on:click={() => showAttachments = !showAttachments} />
+            <AttachmentIcon type="video" on:click={() => showVideo = !showVideo} />
           {/if}
         </div>
         
