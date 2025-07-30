@@ -1,10 +1,10 @@
 <script lang="ts">
-  //Import necessary modules
+  // Import necessary modules
   import { todosStore } from '$lib/stores/todos';
   import TodoItem from './TodoItem.svelte';
-  import type { Todo } from '$lib/models';
+  import type { Todo } from '$lib/types';
   
-  // Filter state variables
+  //Filter state variables
   let filterType: 'all' | 'completed' | 'pending' = 'all';
   
   // Reactive statement to filter and sort todos
@@ -33,50 +33,53 @@
 <div class="space-y-4">
   <!-- Filter buttons -->
   {#if $todosStore.length > 0}
-    <div class="flex flex-wrap gap-2 p-4 bg-gray-50 rounded-lg">
-      <span class="text-sm font-medium text-gray-700 mr-2">Filter:</span>
+    <div class="flex flex-wrap-nowrap items-center justify-between gap-1 p-2 bg-gray-50 rounded-lg sm:gap-2 sm:p-4">
+      <!-- UPDATED: "Filter:" text is now hidden on extra-small screens -->
+      <span class="hidden text-sm font-medium text-gray-700 mr-2 xs:inline">Filter:</span>
       
-      <!-- All todos filter button -->
-      <button
-        on:click={() => handleFilterChange('all')}
-        class="px-3 py-1 text-xs font-medium rounded-full transition-colors duration-200"
-        class:bg-blue-500={filterType === 'all'}
-        class:text-white={filterType === 'all'}
-        class:bg-gray-200={filterType !== 'all'}
-        class:text-gray-700={filterType !== 'all'}
-        class:hover:bg-blue-400={filterType === 'all'}
-        class:hover:bg-gray-300={filterType !== 'all'}
-      >
-        All ({$todosStore.length})
-      </button>
-      
-      <!-- Pending todos filter button -->
-      <button
-        on:click={() => handleFilterChange('pending')}
-        class="px-3 py-1 text-xs font-medium rounded-full transition-colors duration-200"
-        class:bg-yellow-500={filterType === 'pending'}
-        class:text-white={filterType === 'pending'}
-        class:bg-gray-200={filterType !== 'pending'}
-        class:text-gray-700={filterType !== 'pending'}
-        class:hover:bg-yellow-400={filterType === 'pending'}
-        class:hover:bg-gray-300={filterType !== 'pending'}
-      >
-        Pending ({$todosStore.filter(todo => !todo.completed).length})
-      </button>
-      
-      <!-- Completed todos filter button -->
-      <button
-        on:click={() => handleFilterChange('completed')}
-        class="px-3 py-1 text-xs font-medium rounded-full transition-colors duration-200"
-        class:bg-green-500={filterType === 'completed'}
-        class:text-white={filterType === 'completed'}
-        class:bg-gray-200={filterType !== 'completed'}
-        class:text-gray-700={filterType !== 'completed'}
-        class:hover:bg-green-400={filterType === 'completed'}
-        class:hover:bg-gray-300={filterType !== 'completed'}
-      >
-        Completed ({$todosStore.filter(todo => todo.completed).length})
-      </button>
+      <div class="flex items-center gap-1 sm:gap-2">
+        <!-- All todos filter button -->
+        <button
+          on:click={() => handleFilterChange('all')}
+          class="px-3 py-1 text-xs font-medium rounded-full transition-colors duration-200"
+          class:bg-blue-500={filterType === 'all'}
+          class:text-white={filterType === 'all'}
+          class:bg-gray-200={filterType !== 'all'}
+          class:text-gray-700={filterType !== 'all'}
+          class:hover:bg-blue-400={filterType === 'all'}
+          class:hover:bg-gray-300={filterType !== 'all'}
+        >
+          All ({$todosStore.length})
+        </button>
+        
+        <!-- Pending todos filter button -->
+        <button
+          on:click={() => handleFilterChange('pending')}
+          class="px-3 py-1 text-xs font-medium rounded-full transition-colors duration-200"
+          class:bg-yellow-500={filterType === 'pending'}
+          class:text-white={filterType === 'pending'}
+          class:bg-gray-200={filterType !== 'pending'}
+          class:text-gray-700={filterType !== 'pending'}
+          class:hover:bg-yellow-400={filterType === 'pending'}
+          class:hover:bg-gray-300={filterType !== 'pending'}
+        >
+          Pending ({$todosStore.filter(todo => !todo.completed).length})
+        </button>
+        
+        <!-- Completed todos filter button -->
+        <button
+          on:click={() => handleFilterChange('completed')}
+          class="px-3 py-1 text-xs font-medium rounded-full transition-colors duration-200"
+          class:bg-green-500={filterType === 'completed'}
+          class:text-white={filterType === 'completed'}
+          class:bg-gray-200={filterType !== 'completed'}
+          class:text-gray-700={filterType !== 'completed'}
+          class:hover:bg-green-400={filterType === 'completed'}
+          class:hover:bg-gray-300={filterType !== 'completed'}
+        >
+          Completed ({$todosStore.filter(todo => todo.completed).length})
+        </button>
+      </div>
     </div>
   {/if}
   

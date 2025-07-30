@@ -11,6 +11,7 @@ import {
   orderBy,
   onSnapshot,
   type Unsubscribe,
+  or,
 } from "firebase/firestore";
 import {
   getStorage,
@@ -225,30 +226,69 @@ export const deleteTodo = async (todoId: string): Promise<boolean> => {
 //Function to update todo text
 export const updateTodo = async (
   todoId: string,
-  newText: string
+  updates: { newText: string; imageFile?: File; videoFile?: File },
+  originalTodo: Todo
 ): Promise<boolean> => {
   try {
     todosError.set(null);
 
     //Validate todo text length
-    if (newText.length > 250) {
-      todosError.set("Todo text cannot be longer than 250 characters");
-      return false;
+    const { newText, imageFile, videoFile } = updates;
+    const dataToUpdate: any = {};
+    const userId = originalTodo.userId;
+
+    if (newText) {
+      if (newText.length > 250) {
+        todosError.set("Todo text cannot be longer than 250 characters");
+        return false;
+      }
+      if (newText.trim() === "") {
+        todosError.set("Todo text cannot be empty");
+        return false;
+      }
+      dataToUpdate.text = newText.trim();
     }
 
-    //Validate that text is not empty
-    if (newText.trim() === "") {
-      todosError.set("Todo text cannot be empty");
-      return false;
+    if (imageFile) {
+      if (originalTodo.imageUrl) {
+        const oldImageRef = ref(storage, originalTodo.imageUrl);
+        await deleteObject(oldImageRef).catch((err) =>
+          toast.error("Error in Uploading Image")
+        );
+      }
+      const newImageRef = ref(
+        storage,
+        `todos/${userId}/${Date.now()}_${imageFile.name}`
+      );
+      await uploadBytes(newImageRef, imageFile);
+      dataToUpdate.imageUrl = await getDownloadURL(newImageRef);
     }
 
-    //Update todo in Firestore
-    const todoRef = doc(db, "todos", todoId);
-    await updateDoc(todoRef, {
-      text: newText.trim(),
-    });
-    toast.success("Todo Update Successfully"); 
-   
+    if (videoFile) {
+      // First, delete the old video from Storage if it exists
+      if (originalTodo.videoUrl) {
+        const oldVideoRef = ref(storage, originalTodo.videoUrl);
+        await deleteObject(oldVideoRef).catch((err) =>
+          console.error("Could not delete old video:", err)
+        );
+      }
+      // Then, upload the new video
+      const newVideoRef = ref(
+        storage,
+        `todos/${userId}/${Date.now()}_${videoFile.name}`
+      );
+      await uploadBytes(newVideoRef, videoFile);
+      dataToUpdate.videoUrl = await getDownloadURL(newVideoRef);
+    }
+
+    // Only update Firestore if there are actual changes
+    if (Object.keys(dataToUpdate).length > 0) {
+      const todoRef = doc(db, "todos", todoId);
+      await updateDoc(todoRef, dataToUpdate);
+    }
+
+    toast.success("Todo Update Successfully");
+
     return true;
   } catch (error: any) {
     console.error("Error updating todo:", error);

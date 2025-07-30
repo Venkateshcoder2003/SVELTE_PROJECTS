@@ -1,6 +1,5 @@
 <!-- Dashboard page - protected route for authenticated users -->
 <!-- Main todo management interface -->
-
 <script lang="ts">
   // Import necessary modules
   import { onMount, onDestroy } from 'svelte';
@@ -20,7 +19,6 @@
   
   // Check authentication and setup todos subscription when component mounts
   onMount(() => {
-    // Subscribe to auth store changes
     const unsubscribeAuth = authStore.subscribe((auth) => {
       if (!auth.loading) {
         if (!auth.user) {
@@ -60,14 +58,15 @@
 <!-- Show dashboard for authenticated users -->
 {:else if $authStore.user}
   <div class="max-w-4xl mx-auto">
-    <!-- Dashboard header -->
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-800 mb-2">
-        📝 Your Todo Dashboard
-      </h1>
-      <p class="text-gray-600">
-        Manage your tasks and stay organized
-      </p>
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800">
+          📝 Todo Dashboard
+        </h1>
+        <p class="text-gray-600 mt-1 sm:mt-0">
+          Manage your tasks and stay organized
+        </p>
+      </div>
     </div>
     
     <!-- Add new todo section -->
@@ -112,36 +111,35 @@
         <TodoList />
       {/if}
     </div>
-    
-    <!-- Quick stats section -->
+
     {#if !$todosLoading && $todosStore.length > 0}
-      <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="mt-6 grid grid-cols-3 gap-2 sm:gap-4">
         <!-- Total todos -->
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-          <div class="text-2xl font-bold text-blue-600">
+          <div class="text-xl sm:text-2xl font-bold text-blue-600">
             {$todosStore.length}
           </div>
-          <div class="text-sm text-blue-700">
+          <div class="text-xs sm:text-sm text-blue-700">
             Total Todos
           </div>
         </div>
         
         <!-- Completed todos -->
         <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-          <div class="text-2xl font-bold text-green-600">
+          <div class="text-xl sm:text-2xl font-bold text-green-600">
             {$todosStore.filter(todo => todo.completed).length}
           </div>
-          <div class="text-sm text-green-700">
+          <div class="text-xs sm:text-sm text-green-700">
             Completed
           </div>
         </div>
         
         <!-- Pending todos -->
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-          <div class="text-2xl font-bold text-yellow-600">
+          <div class="text-xl sm:text-2xl font-bold text-yellow-600">
             {$todosStore.filter(todo => !todo.completed).length}
           </div>
-          <div class="text-sm text-yellow-700">
+          <div class="text-xs sm:text-sm text-yellow-700">
             Pending
           </div>
         </div>

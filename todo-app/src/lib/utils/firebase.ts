@@ -1,21 +1,60 @@
-//Import the necessary functions from the Firebase SDKs
-import { initializeApp } from "firebase/app";
+// Import the necessary functions from the Firebase SDKs
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-//Firebase Configuration
+import { browser } from "$app/environment";
+
+// Firebase Configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAX7eGs4pexCPUaTDxDU0MQd_t2nKTv_2A",
-  authDomain: "to-do-app-e0d20.firebaseapp.com",
-  projectId: "to-do-app-e0d20",
-  storageBucket: "to-do-app-e0d20.firebasestorage.app",
-  messagingSenderId: "357054921830",
-  appId: "1:357054921830:web:87e844073b4a7cefc0c1a7",
-  measurementId: "G-BWYJJJC8CK",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-//Initialize the Firebase app with configuration
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app); //The Authentication service
-export const db = getFirestore(app); //The Firestore Database service
-export const storage = getStorage(app); //The Cloud Storage service
+// Validate configuration
+function validateFirebaseConfig() {
+  const requiredFields = ["apiKey", "authDomain", "projectId"];
+  for (const field of requiredFields) {
+    if (!firebaseConfig[field as keyof typeof firebaseConfig]) {
+      throw new Error(`Missing Firebase configuration: ${field}`);
+    }
+  }
+}
+
+// Initialize Firebase only on client side or when needed
+let app: any;
+let auth: any;
+let db: any;
+let storage: any;
+
+// Initialize Firebase app
+try {
+  validateFirebaseConfig();
+  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+} catch (error) {
+  console.error("Firebase initialization error:", error);
+  // Create a mock app for SSR to prevent crashes
+  if (!browser) {
+    app = null;
+  } else {
+    throw error;
+  }
+}
+
+// Initialize services only if app exists
+if (app) {
+  try {
+    auth = getAuth(app);
+    db = getFirestore(app);
+    storage = getStorage(app);
+  } catch (error) {
+    console.error("Firebase services initialization error:", error);
+  }
+}
+
+export { auth, db, storage };

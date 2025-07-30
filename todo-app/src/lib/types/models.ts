@@ -13,7 +13,8 @@ export interface Todo {
 export interface User {
   uid: string; //Firebase user ID
   email: string; //User's email address
-  displayName?: string; //Optional display name
+  displayName?: string;
+  creationTime?: string;
 }
 
 //Interface for authentication state

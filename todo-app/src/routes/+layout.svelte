@@ -16,3 +16,16 @@
     <slot />
   </main>
 </div>
+
+<style>
+  /* Use a media query to target screens smaller than 640px */
+  @media (max-width: 640px) {
+    /* [data-sonner-toast] is the selector for the toast component.
+      We use !important to ensure these styles override the library's defaults.
+    */
+    :global([data-sonner-toast]) {
+      font-size: 0.875rem !important; /* Smaller font */
+      padding: 12px 16px !important;   /* Smaller padding */
+    }
+  }
+</style>

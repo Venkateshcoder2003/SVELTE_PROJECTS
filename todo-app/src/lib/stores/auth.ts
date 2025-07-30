@@ -120,6 +120,7 @@ onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
       uid: firebaseUser.uid,
       email: firebaseUser.email || "",
       displayName: firebaseUser.displayName || undefined,
+      creationTime: firebaseUser.metadata.creationTime,
     };
 
     authStore.update((state) => ({
