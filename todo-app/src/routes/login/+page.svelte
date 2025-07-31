@@ -1,27 +1,27 @@
 <script lang="ts">
-  // Import necessary modules
+  //Import necessary modules
   import { goto } from '$app/navigation';
   import { authStore, signIn } from '$lib/stores/auth';
   import type { LoginForm } from '$lib/types';
   import { toast } from "svelte-sonner";
 
-  // Form data object
+  //Create user data object 
   let formData: LoginForm = {
     email: '',
     password: ''
   };
   
-  // Local loading state for form submission
+  //Local loading state for form submission
   let isSubmitting = false;
-  // State to toggle password visibility
+  //State to toggle password visibility
   let showPassword = false;
   
-  // Function to handle form submission
+  //Function to handle form submission
   async function handleSubmit() {
-    // Prevent multiple submissions
+    //Prevent multiple submissions
     if (isSubmitting) return;
     
-    // Form validation
+    //Form validation
     if (!formData.email || !formData.password) {
       toast.error("Please fill in all fields.");
       return;

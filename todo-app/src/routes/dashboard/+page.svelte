@@ -14,6 +14,9 @@
   // Import todo components
   import AddTodo from '$lib/components/AddTodo.svelte';
   import TodoList from '$lib/components/TodoList.svelte';
+  import { Logger } from "../utils/logger";
+
+  const log = Logger.getInstance();
   
   // Check authentication and setup todos subscription when component mounts
   onMount(() => {
@@ -79,6 +82,7 @@
     <!-- Todos error display -->
     {#if $todosError}
       <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm mb-6">
+        {log.error("dashboard", $todosError)}
         {$todosError}
       </div>
     {/if}

@@ -22,8 +22,9 @@ import {
 } from "firebase/storage";
 import { db, storage } from "../utils/firebase";
 import type { Todo } from "../models";
-import { toast } from "svelte-sonner";
+import { Logger } from "../utils/logger";
 
+const log = Logger.getInstance();
 //Stores the main array of todo items
 export const todosStore = writable<Todo[]>([]);
 
@@ -143,10 +144,11 @@ export const addTodo = async (
     }
     //Add new todo to Firestore
     await addDoc(collection(db, "todos"), newTodoData);
-    toast.success(`${newTodoData.text} Todo added successfully!`);
+    log.info('todos', `${newTodoData.text} Todo added successfully!`);
 
     return true; //Success
   } catch (error: any) {
+    log.error("todos", error.message, error);
     console.error("Error adding todo:", error);
     todosError.set(error.message);
     return false; //Failed to add Todo
@@ -174,9 +176,12 @@ export const toggleTodo = async (todoId: string): Promise<boolean> => {
     await updateDoc(todoRef, {
       completed: !todoToToggle.completed,
     });
-
+    
+    const successMessage = todoToToggle.completed ? "Todo marked as pending." : "Todo completed!";
+    log.info("todos",successMessage);
     return true;
   } catch (error: any) {
+    log.error("todos", error.message, error);
     console.error("Error toggling todo:", error);
     todosError.set(error.message);
     return false;
@@ -213,10 +218,11 @@ export const deleteTodo = async (todoId: string): Promise<boolean> => {
 
     //Delete todo document from Firestore
     await deleteDoc(doc(db, "todos", todoId));
-    toast.success("Todo deleted Successfully");
+    log.info("todos", "Todo deleted Successfully");
 
     return true;
   } catch (error: any) {
+    log.error("todos", error.message, error);
     console.error("Error deleting todo:", error);
     todosError.set(error.message);
     return false;
@@ -287,10 +293,11 @@ export const updateTodo = async (
       await updateDoc(todoRef, dataToUpdate);
     }
 
-    toast.success("Todo Update Successfully");
+    log.info("todos", "Todo Update Successfully");
 
     return true;
   } catch (error: any) {
+    log.error("todos", error.message, error);
     console.error("Error updating todo:", error);
     todosError.set(error.message);
     return false;

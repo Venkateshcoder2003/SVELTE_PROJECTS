@@ -11,8 +11,10 @@ import {
 } from "firebase/auth";
 import { auth } from "../utils/firebase"; //Importing Firebase auth instance configured in our project
 import type { User, AuthState } from "../models";
-import { toast } from "svelte-sonner";
+import { Logger } from "../utils/logger";
 
+//create a instane of Logger class
+const log = Logger.getInstance();
 //Initial authentication state
 const initialState: AuthState = {
   user: null,
@@ -45,9 +47,10 @@ export const signUp = async (
       loading: false,
       error: null,
     }));
-
+    log.info("AuthStore", "Account created successfully!");
     return true; //Signup successful
   } catch (error: any) {
+    log.error("AuthStore", error.message, error);
     //Update store with error
     authStore.update((state) => ({
       ...state,
@@ -80,9 +83,10 @@ export const signIn = async (
       loading: false,
       error: null,
     }));
-
+    log.info("AuthStore", "SignIn successfull!");
     return true; //Signin successful
   } catch (error: any) {
+    log.error("AuthStore", error.message, error);
     //Update store with error
     authStore.update((state) => ({
       ...state,
@@ -105,7 +109,9 @@ export const signOutUser = async (): Promise<void> => {
       user: null,
       error: null,
     }));
+    log.info("AuthStore", "Logged Out Successfully!");
   } catch (error: any) {
+    log.error("AuthStore", error.message, error);
     //Update store with error
     authStore.update((state) => ({
       ...state,
@@ -121,15 +127,13 @@ export const forgotPassword = async (email: string): Promise<boolean> => {
   }
   try {
     await sendPasswordResetEmail(auth, email);
-    toast.success("Password reset email sent! Please check your inbox or Spam.");
+    log.info("AuthStore", 
+      "Password reset email sent! Please check your inbox or Spam."
+    );
     return true;
   } catch (error: any) {
-
     let message = "Failed to send password reset email.";
-    if (error.code === "auth/user-not-found") {
-      message = "No account found with that email address.";
-    }
-    toast.error(message);
+    log.error("AuthStore", message, error);
     return false;
   }
 };

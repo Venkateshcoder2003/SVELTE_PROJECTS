@@ -5,42 +5,42 @@
   import { authStore, signOutUser } from '$lib/stores/auth';
   import { toast } from 'svelte-sonner';
 
-  // State to control the visibility of the profile dropdown
+  //State to control the visibility of the profile dropdown
   let showProfileMenu = false;
 
-  // Function to handle user logout
+  //Function to handle user logout
   async function handleLogout() {
-    showProfileMenu = false; // Close menu on logout
+    showProfileMenu = false; //Close menu on logout
     await signOutUser();
     toast.success("You have been logged out.");
     goto('/');
   }
 
-  // Helper function to format the creation date
+  //Helper function to format the creation date
   function formatCreationDate(dateString: string | undefined): string {
     if (!dateString) return 'Member';
-    return `Joined ${new Date(dateString).toLocaleDateString('en-US', {
+    return `Active Since ${new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
     })}`;
   }
 
   // --- Logic to close the menu when clicking outside ---
-  let profileMenuNode: HTMLElement;
+  let profileMenu: HTMLElement;
 
   function handleClickOutside(event: MouseEvent) {
     // If the menu is open and the click is outside the menu, close it
-    if (showProfileMenu && !profileMenuNode.contains(event.target as Node)) {
+    if (showProfileMenu && !profileMenu.contains(event.target)) {
       showProfileMenu = false;
     }
   }
 
-  // Add the event listener when the component mounts
+  //Add the event listener when the component mounts
   onMount(() => {
     window.addEventListener('click', handleClickOutside);
   });
 
-  // Clean up the event listener when the component is destroyed
+  //Clean up the event listener when the component is destroyed
   onDestroy(() => {
     window.removeEventListener('click', handleClickOutside);
   });
@@ -56,7 +56,7 @@
       </a>
       
       <!-- Container for the profile button and dropdown -->
-      <div class="relative" bind:this={profileMenuNode}>
+      <div class="relative" bind:this={profileMenu}>
         <!-- NEW: Circular Profile Button -->
         <button
           on:click={() => showProfileMenu = !showProfileMenu}
