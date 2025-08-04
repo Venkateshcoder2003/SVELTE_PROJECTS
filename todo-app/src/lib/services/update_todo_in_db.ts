@@ -35,7 +35,7 @@ export const updateTodoInDb = async (
         return false;
       }
       if (newTitle.length > 10) {
-        setTodosError("Todo title cannot be longer than 10 characters");
+        setTodosError("Todo title cannot be longer than 100 characters");
         return false;
       }
       dataToUpdate.title = newTitle.trim();

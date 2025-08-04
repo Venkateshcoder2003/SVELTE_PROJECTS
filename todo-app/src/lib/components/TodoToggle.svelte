@@ -2,7 +2,7 @@
   import { toggleTodo } from '$lib/stores/todos';
   import type { Todo } from '$lib/types';
   import { toast } from "svelte-sonner";
-import LoadingSpinner from './LoadingSpinner.svelte';
+  import LoadingSpinner from './LoadingSpinner.svelte';
 
   export let todo: Todo;
 

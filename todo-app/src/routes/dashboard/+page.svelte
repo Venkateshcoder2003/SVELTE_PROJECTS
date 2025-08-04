@@ -77,6 +77,7 @@
   // Handle confirm delete from dialog
   const handleConfirmDelete = () => {
     handleDeleteAll();
+    showDeleteAllConfirm=false;
   };
 
   // Handle cancel delete from dialog

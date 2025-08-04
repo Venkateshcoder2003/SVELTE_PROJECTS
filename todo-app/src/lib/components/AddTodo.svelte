@@ -76,6 +76,12 @@
       const form = document.querySelector('form');
       form?.reset(); 
     }
+<<<<<<< HEAD
+=======
+    else{
+        localError="Todo With same name already Exists";
+    }
+>>>>>>> 6a9a601 (fix: fixed logic for Delete All button)
   }
   
   // Handle Enter key press
@@ -96,6 +102,7 @@
 <!-- Add todo form -->
 <form on:submit|preventDefault={handleSubmit} class="space-y-4">
   
+  <ErrorDisplay error={localError} />
   <!-- Title Input with Character Count -->
   <div class="flex flex-col mb-4">
     <div class="flex justify-between items-center mb-1">
@@ -169,7 +176,7 @@
   </div>
 
   <!-- Error Display -->
-  <ErrorDisplay error={localError} />
+  
 
   <!-- Submit Button -->
   <Button
