@@ -23,13 +23,16 @@
       </span>
     {/if}
     {#if !todosLoading && $todosStore.length > 0}
-      <button
-        on:click={handleDeleteAll}
-        class="px-3 py-1.5 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors duration-200 flex items-center space-x-1"
+      <Button
+        text="Delete All"
+        loading={isDeleting}
+        loadingText="Deleting..."
         disabled={isDeleting}
-      >
-        <span class="select-none font-bold whitespace-nowrap">Delete All</span>
-      </button>
+        buttonClass="px-3 py-1.5 text-sm bg-red-500 hover:bg-red-600 disabled:bg-red-300 disabled:cursor-not-allowed text-white rounded-md transition-colors duration-200 font-bold whitespace-nowrap"
+        spinnerSize="small"
+        spinnerColor="white"
+        on:click={handleDeleteAll}
+      />
     {/if}
   </div>
 </div>
