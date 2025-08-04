@@ -2,7 +2,7 @@
 import { Logger } from "../utils/logger";
 import { toast } from "svelte-sonner";
 import type { Todo } from "../types/models";
-import { setTodosError } from "../utils/todos_lce";
+import { setTodosError, isDuplicateTodo } from "../utils/todos_lce";
 import {
   deleteFile,
   uploadFile,
@@ -27,6 +27,15 @@ export const updateTodoInDb = async (
     const { newTitle, newText, imageFile, videoFile } = updates;
     const dataToUpdate: any = {};
     const userId = originalTodo.userId;
+
+    if(newTitle){
+      if (newTitle !== originalTodo.title && isDuplicateTodo(newTitle)) {
+        setTodosError("A todo with this title already exists.");
+        log.error("todos", "A todo with this title already exists.");
+        toast.error("A todo with the same title already exists");
+        return false;
+      }
+    }
 
     // Validate updates
     if (newTitle !== undefined) {

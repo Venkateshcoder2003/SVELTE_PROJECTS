@@ -76,12 +76,9 @@
       const form = document.querySelector('form');
       form?.reset(); 
     }
-<<<<<<< HEAD
-=======
     else{
         localError="Todo With same name already Exists";
     }
->>>>>>> 6a9a601 (fix: fixed logic for Delete All button)
   }
   
   // Handle Enter key press

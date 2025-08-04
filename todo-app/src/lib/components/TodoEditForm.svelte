@@ -71,6 +71,9 @@
     if (success) {
       dispatch('save');
     }
+    else{
+       editError = 'Todo with the same Title already exists';
+    }
   }
 
   function cancelEditing() {
@@ -100,6 +103,7 @@
 </script>
 
 <div class="select-none space-y-3 flex flex-col h-full">
+  
   <InputField
     id="edit-title-{todo.id}"
     label="Title"

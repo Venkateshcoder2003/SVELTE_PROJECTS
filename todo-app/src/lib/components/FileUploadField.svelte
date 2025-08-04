@@ -19,7 +19,7 @@
 </script>
 
 <div>
-  <label for={id} class="select-none block text-sm font-medium text-gray-700 mb-2">
+  <label for={id} class="select-none block text-sm font-medium text-gray-700 mb-1/2">
     {label}
   </label>
   <input 
@@ -28,6 +28,6 @@
     {accept}
     {disabled}
     on:change={handleChange}
-    class="cursor-pointer w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold {fileStyle}"
+    class="cursor-pointer w-full text-sm text-gray-500  file:mr-2 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold {fileStyle}"
   />
 </div>
