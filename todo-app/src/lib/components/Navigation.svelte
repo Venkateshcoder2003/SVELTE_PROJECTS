@@ -2,21 +2,25 @@
   // Import necessary modules
   import { onMount, onDestroy } from 'svelte';
   import { goto } from '$app/navigation';
-  import { authStore, signOutUser } from '$lib/stores/auth';
-  import { toast } from 'svelte-sonner';
+  import { signOutUser } from '$lib/stores/auth';
+  import { Logger } from '$lib/utils/logger';
+  import { authStore } from '$lib/utils/auth_lce';
+  import Button from '$lib/components/Button.svelte';
 
-  //State to control the visibility of the profile dropdown
+  // State to control the visibility of the profile dropdown
   let showProfileMenu = false;
+  let isLoggingOut = false;
 
-  //Function to handle user logout
+  // Function to handle user logout
   async function handleLogout() {
-    showProfileMenu = false; //Close menu on logout
+    showProfileMenu = false; // Close menu on logout
+    isLoggingOut = true;
     await signOutUser();
-    toast.success("You have been logged out.");
+    isLoggingOut = false;
     goto('/');
   }
 
-  //Helper function to format the creation date
+  // Helper function to format the creation date
   function formatCreationDate(dateString: string | undefined): string {
     if (!dateString) return 'Member';
     return `Active Since ${new Date(dateString).toLocaleDateString('en-US', {
@@ -35,12 +39,12 @@
     }
   }
 
-  //Add the event listener when the component mounts
+  // Add the event listener when the component mounts
   onMount(() => {
     window.addEventListener('click', handleClickOutside);
   });
 
-  //Clean up the event listener when the component is destroyed
+  // Clean up the event listener when the component is destroyed
   onDestroy(() => {
     window.removeEventListener('click', handleClickOutside);
   });
@@ -51,8 +55,8 @@
     <div class="flex justify-between items-center h-16">
       
       <a href="/dashboard" class="flex items-center space-x-2 text-xl font-bold text-slate-200 hover:text-white transition-colors">
-        <span class="text-2xl">📝</span>
-        <h1>Todo App</h1>
+        <span class="select-none text-2xl"><span>&#x1F4DD;</span></span>
+        <h1 class="select-none">Todo App</h1>
       </a>
       
       <!-- Container for the profile button and dropdown -->
@@ -60,7 +64,7 @@
         <!-- NEW: Circular Profile Button -->
         <button
           on:click={() => showProfileMenu = !showProfileMenu}
-          class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-white"
+          class="select-none w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-white"
           aria-label="Open user menu"
         >
           <!-- Show the first letter of the user's email -->
@@ -71,26 +75,26 @@
         {#if showProfileMenu}
           <div class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-xl py-1 z-50 ring-1 ring-black ring-opacity-5">
             <!-- User Info Section -->
-            <div class="px-4 py-3 border-b border-gray-200">
-              <p class="text-sm text-gray-800 font-semibold truncate">
+            <div class="hover:bg-gray-100 px-4 py-3 border-b border-gray-200">
+              <p class="hover:bg-gray-100 select-none text-sm text-gray-800 font-semibold truncate">
                 {$authStore.user?.email}
               </p>
-              <p class="text-xs text-gray-500">
+              <p class="hover:bg-gray-100 select-none text-xs text-gray-500">
                 {formatCreationDate($authStore.user?.creationTime)}
               </p>
             </div>
             <!-- Logout Button Section -->
             <div class="py-1">
-              <button
+              <Button
+                type="button"
+                text="Logout"
+                loadingText="Logging out..."
+                loading={isLoggingOut}
+                disabled={isLoggingOut}
+                buttonClass="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:bg-gray-50 disabled:cursor-not-allowed flex items-center space-x-3 transition-colors"
+                spinnerColor="gray-600"
                 on:click={handleLogout}
-                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-3"
-              >
-                <!-- Logout Icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
-                </svg>
-                <span>Logout</span>
-              </button>
+              />
             </div>
           </div>
         {/if}

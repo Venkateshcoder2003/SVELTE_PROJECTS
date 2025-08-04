@@ -1,5 +1,3 @@
-import { toast } from 'svelte-sonner';
-
 //singleton logger class that provides structured console logging and toast notifications
 export class Logger {
   //A private static property to hold the single instance of the logger.
@@ -22,21 +20,18 @@ export class Logger {
   //Logs an informational message and shows a success toast
   info(context: string, message: string, data?: any) {
     const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] [INFO] [${context}] ${message}`, data || '');
-    toast.success(message);
+    console.log(`[${timestamp}] [INFO] [${context}] ${message}`, data || "");
   }
 
   //Logs a warning message and shows a warning toast
   warn(context: string, message: string, data?: any) {
     const timestamp = new Date().toISOString();
-    console.warn(`[${timestamp}] [WARN] [${context}] ${message}`, data || '');
-    toast.warning(message);
+    console.warn(`[${timestamp}] [WARN] [${context}] ${message}`, data || "");
   }
 
   //Logs an error message and shows an error toast
   error(context: string, message: string, data?: any) {
     const timestamp = new Date().toISOString();
-    console.error(`[${timestamp}] [ERROR] [${context}] ${message}`, data || '');
-    toast.error(message);
+    console.error(`[${timestamp}] [ERROR] [${context}] ${message}`, data || "");
   }
 }

@@ -1,25 +1,47 @@
 <script lang="ts">
-  // Import necessary modules
-  import { onMount, onDestroy } from 'svelte';
+  //Import necessary modules
+  import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { authStore } from '$lib/stores/auth';
-  import { 
-    todosStore, 
-    todosLoading, 
+  import { authStore } from '$lib/utils/auth_lce';
+  import {
+    todosStore,
+    todosLoading,
     todosError,
-    subscribeTodos, 
-    unsubscribeTodos 
+    subscribeTodos,
+    unsubscribeTodos,
+    deleteAllTodos
   } from '$lib/stores/todos';
-  
-  // Import todo components
-  import AddTodo from '$lib/components/AddTodo.svelte';
-  import TodoList from '$lib/components/TodoList.svelte';
-  import { Logger } from "../utils/logger";
+
+  //Import components
+  import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
+  import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
+  import DashboardHeader from '$lib/components/DashboardHeader.svelte';
+  import AddTodoSection from '$lib/components/AddTodoSection.svelte';
+  import TodosSection from '$lib/components/TodosSection.svelte';
+  import { Logger } from '$lib/utils/logger';
 
   const log = Logger.getInstance();
-  
-  // Check authentication and setup todos subscription when component mounts
+
+  // State for delete all confirmation
+  let showDeleteAllConfirm = false;
+  let isDeleting = false;
+
+  // Reference to the ConfirmDialog component's DOM element
+  let confirmDialogElement: HTMLElement;
+
+  // Function to handle clicks outside the ConfirmDialog
+  function handleClickOutside(event: MouseEvent) {
+    // Check if the dialog is open and the click is outside the dialog element
+    if (showDeleteAllConfirm && confirmDialogElement && !confirmDialogElement.contains(event.target as Node)) {
+      showDeleteAllConfirm = false;
+    }
+  }
+
+  // ALL onMount logic consolidated into a single block
   onMount(() => {
+    // Add the click listener to the document
+    document.addEventListener('mousedown', handleClickOutside);
+
     const unsubscribeAuth = authStore.subscribe((auth) => {
       if (!auth.loading) {
         if (!auth.user) {
@@ -31,123 +53,75 @@
         }
       }
     });
-    
+
     // Cleanup function will run when component is destroyed
     return () => {
+      // Clean up the auth store subscription
       unsubscribeAuth();
-      unsubscribeTodos(); // Stop listening to todos
+      // Clean up the todos subscription
+      unsubscribeTodos();
+      // Clean up the global event listener
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   });
   
-  // Cleanup todos subscription when component is destroyed
-  onDestroy(() => {
-    unsubscribeTodos();
-  });
+  // Handle delete all todos
+  const handleDeleteAll = async () => {
+    if (!$authStore.user) return;
+
+    isDeleting = true;
+    const success = await deleteAllTodos($authStore.user.uid);
+    isDeleting = false;
+  };
+
+  // Handle confirm delete from dialog
+  const handleConfirmDelete = () => {
+    handleDeleteAll();
+  };
+
+  // Handle cancel delete from dialog
+  const handleCancelDelete = () => {
+    showDeleteAllConfirm = false;
+  };
+
+  // Handle delete all event from TodosSection
+  const handleDeleteAllEvent = () => {
+    showDeleteAllConfirm = true;
+  };
 </script>
 
-<!-- Page title -->
+<ConfirmDialog
+  bind:this={confirmDialogElement}
+  bind:show={showDeleteAllConfirm}
+  title="Delete All Todos"
+  message="Are you sure you want to delete all {$todosStore.length} todos? This will permanently remove all your todos and their associated files."
+  on:confirm={handleConfirmDelete}
+  on:cancel={handleCancelDelete}
+/>
+
 <svelte:head>
   <title>Dashboard - Todo App</title>
 </svelte:head>
 
-<!-- Show loading while checking authentication -->
 {#if $authStore.loading}
-  <div class="flex justify-center items-center min-h-[400px]">
-    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-  </div>
+  <LoadingSpinner />
 
-<!-- Show dashboard for authenticated users -->
 {:else if $authStore.user}
-  <div class="max-w-4xl mx-auto">
-    <!-- Dashboard header -->
-    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-800">
-          📝 Todo Dashboard
-        </h1>
-        <p class="text-gray-600 mt-1 sm:mt-0">
-          Manage your tasks and stay organized
-        </p>
-      </div>
-    </div>
-    
-    <!-- Add new todo section -->
-    <div class="bg-slate-50 rounded-lg shadow-md p-6 mb-6 border border-slate-200">
-      <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-3 border-b border-slate-200">
-        Add New Todo
-      </h2>
-      <AddTodo />
-    </div>
-    
-    <!-- Todos error display -->
-    {#if $todosError}
-      <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm mb-6">
-        {log.error("dashboard", $todosError)}
-        {$todosError}
-      </div>
-    {/if}
-    
-    <!-- Todos list section -->
-    <div class="bg-slate-50 rounded-lg shadow-md p-6 border border-slate-200">
-      <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200">
-        <h2 class="text-xl font-semibold text-gray-800">
-          Your Todos
-        </h2>
-        
-        <!-- Todo count display -->
-        {#if !$todosLoading}
-          <span class="text-sm text-gray-500">
-            {$todosStore.length} {$todosStore.length === 1 ? 'todo' : 'todos'}
-          </span>
-        {/if}
-      </div>
+  <div class="min-h-screen bg-slate-300 rounded">
+    <div class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+      <DashboardHeader />
       
-      <!-- Show loading spinner while loading todos -->
-      {#if $todosLoading}
-        <div class="flex justify-center items-center py-12">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          <span class="ml-2 text-gray-600">Loading your todos...</span>
-        </div>
-      
-      <!-- Show todos list -->
-      {:else}
-        <TodoList />
-      {/if}
-    </div>
-    
-    <!-- Quick stats section -->
-    {#if !$todosLoading && $todosStore.length > 0}
-      <div class="mt-6 grid grid-cols-3 gap-2 sm:gap-4">
-        <!-- Total todos -->
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-          <div class="text-xl sm:text-2xl font-bold text-blue-600">
-            {$todosStore.length}
-          </div>
-          <div class="text-xs sm:text-sm text-blue-700">
-            Total Todos
-          </div>
-        </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 xl:gap-20">
+        <AddTodoSection {todosStore} todosLoading={$todosLoading} />
         
-        <!-- Completed todos -->
-        <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-          <div class="text-xl sm:text-2xl font-bold text-green-600">
-            {$todosStore.filter(todo => todo.completed).length}
-          </div>
-          <div class="text-xs sm:text-sm text-green-700">
-            Completed
-          </div>
-        </div>
-        
-        <!-- Pending todos -->
-        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-          <div class="text-xl sm:text-2xl font-bold text-yellow-600">
-            {$todosStore.filter(todo => !todo.completed).length}
-          </div>
-          <div class="text-xs sm:text-sm text-yellow-700">
-            Pending
-          </div>
-        </div>
+        <TodosSection 
+          {todosStore} 
+          todosLoading={$todosLoading} 
+          {todosError} 
+          {isDeleting}
+          on:deleteAll={handleDeleteAllEvent}
+        />
       </div>
-    {/if}
+    </div>
   </div>
 {/if}

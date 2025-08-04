@@ -4,6 +4,10 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { browser } from "$app/environment";
+import { Logger } from "./logger";
+
+//create a instane of Logger class
+const log = Logger.getInstance();
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -21,7 +25,7 @@ function validateFirebaseConfig() {
   const requiredFields = ["apiKey", "authDomain", "projectId"];
   for (const field of requiredFields) {
     if (!firebaseConfig[field as keyof typeof firebaseConfig]) {
-      throw new Error(`Missing Firebase configuration: ${field}`);
+      log.error(`firebase`, `Missing Firebase configuration: ${field}`);
     }
   }
 }
@@ -37,13 +41,7 @@ try {
   validateFirebaseConfig();
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 } catch (error) {
-  console.error("Firebase initialization error:", error);
-  // Create a mock app for SSR to prevent crashes
-  if (!browser) {
-    app = null;
-  } else {
-    throw error;
-  }
+  log.error("firebase", `Firebase initialization error: ${error}`);
 }
 
 // Initialize services only if app exists
@@ -53,7 +51,7 @@ if (app) {
     db = getFirestore(app);
     storage = getStorage(app);
   } catch (error) {
-    console.error("Firebase services initialization error:", error);
+    log.error("firebase", "Firebase services initialization error:", error);
   }
 }
 
