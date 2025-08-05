@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let type: 'no-todos' | 'no-completed' | 'no-pending' | 'no-filtered';
+  export let type: 'no-todos' | 'no-completed' | 'no-pending';
 
   const states = {
     'no-todos': {
@@ -22,13 +22,6 @@
       title: 'No pending todos',
       titleSize: 'text-lg',
       description: 'Great job! All your todos are completed.'
-    },
-    'no-filtered': {
-      emoji: '&#x1F4DD;',
-      size: 'text-4xl',
-      title: 'No todos found',
-      titleSize: 'text-lg',
-      description: 'Add your first todo to get started.'
     }
   };
 
