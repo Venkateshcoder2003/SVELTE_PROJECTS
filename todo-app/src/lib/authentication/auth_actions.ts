@@ -1,4 +1,3 @@
-// auth.ts - Authentication functions using LCE store pattern
 import { Logger } from "../utils/logger";
 import { toast } from "svelte-sonner";
 import {
@@ -6,11 +5,11 @@ import {
   signInUser,
   signOutUser as apiSignOut,
   sendPasswordReset,
-} from "../utils/auth_routes";
-import { setLoading, setError, setContent } from "../utils/auth_lce";
+} from "./auth_api";
+import { setLoading, setError, setContent } from "./auth_lce";
 import { onAuthStateChanged, type User as FirebaseUser } from "firebase/auth";
 import { auth } from "../utils/firebase";
-import type { User } from "../types/models";
+import type { User } from "../schema/auth_schema";
 
 // Create an instance of Logger class
 const log = Logger.getInstance();
@@ -31,11 +30,11 @@ export const signUp = async (
     // Update store with successful signup
     setLoading(false);
 
-    log.info("auth", "Sign Up successful!");
+    log.info("auth_actions", "Sign Up successful!");
     toast.success("Account Created Successfully");
     return true; // Signup successful
   } catch (error: any) {
-    log.error("auth", error.message, error);
+    log.error("auth_actions", error.message, error);
     toast.error("Account creation Failed");
 
     // Update store with error
@@ -61,11 +60,11 @@ export const signIn = async (
     // Update store with successful signin
     setLoading(false);
 
-    log.info("auth", "Login successful!");
+    log.info("auth_actions", "Login successful!");
     toast.success("Login Successful!");
     return true; // Signin successful
   } catch (error: any) {
-    log.error("auth", error.message, error);
+    log.error("auth_actions", error.message, error);
     toast.error("Login Failed!");
 
     // Update store with error
@@ -85,12 +84,11 @@ export const signOutUser = async (): Promise<void> => {
     setContent(null);
     setError(null);
 
-    log.info("auth", "Logged Out Successfully!");
+    log.info("auth_actions", "Logged Out Successfully!");
     toast.success("Logged out Successfully");
   } catch (error: any) {
     toast.error("Error during Log out");
-    log.error("auth", error.message, error);
-
+    log.error("auth_actions", error.message, error);
     // Update store with error
     setError(error.message);
   }
@@ -99,7 +97,7 @@ export const signOutUser = async (): Promise<void> => {
 // Function to handle password reset
 export const forgotPassword = async (email: string): Promise<boolean> => {
   if (!email) {
-    log.error("auth", "Please enter your email address.");
+    log.error("auth_actions", "Please enter your email address.");
     toast.error("Please enter your email address.");
     return false;
   }
@@ -109,14 +107,14 @@ export const forgotPassword = async (email: string): Promise<boolean> => {
     await sendPasswordReset(email);
 
     log.info(
-      "auth",
+      "auth_actions",
       "Password reset email sent! Please check your inbox or Spam"
     );
     toast.success("Password reset email sent! Please check your inbox or Spam");
     return true;
   } catch (error: any) {
     const message = "Failed to send password reset email.";
-    log.error("auth", message, error);
+    log.error("auth_actions", message, error);
     toast.error("Failed to send password reset email");
     return false;
   }

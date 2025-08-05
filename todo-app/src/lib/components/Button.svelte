@@ -1,4 +1,5 @@
 <script lang="ts">
+  // Import Spinner component
   import LoadingSpinner from './LoadingSpinner.svelte';
   
   export let type: 'button' | 'submit' = 'button';

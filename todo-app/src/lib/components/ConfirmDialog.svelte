@@ -1,4 +1,5 @@
 <script lang="ts">
+  // Import 
   import { createEventDispatcher } from 'svelte';
   import Button from '$lib/components/Button.svelte';
 
@@ -9,7 +10,8 @@
   export let confirmText = 'Confirm Delete';
   export let cancelText = 'Cancel';
   export let isLoading = false;
-
+  
+  // Create a dispatch event
   const dispatch = createEventDispatcher();
 
   function handleConfirm() {

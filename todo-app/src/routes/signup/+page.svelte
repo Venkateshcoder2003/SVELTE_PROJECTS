@@ -1,10 +1,10 @@
 <script lang="ts">    
   //Import all required Modules
   import { goto } from '$app/navigation';
-  import { signUp } from '$lib/stores/auth';
-  import { authStore } from '$lib/utils/auth_lce';
-  import type { SignupForm } from '$lib/types';
-  import { validateSignupForm } from '$lib/validation';
+  import { signUp } from '$lib/authentication/auth_actions';
+  import { authStore } from '$lib/authentication/auth_lce';
+  import type { SignupForm } from '$lib/schema/form_schems';
+  import { validateSignupForm } from '$lib/utils/validation';
   import InputField from '$lib/components/InputField.svelte';
   import Button from '$lib/components/Button.svelte';
   import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';

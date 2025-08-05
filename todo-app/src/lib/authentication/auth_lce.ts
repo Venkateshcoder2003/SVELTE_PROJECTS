@@ -1,6 +1,6 @@
 // stores/lce.ts - Loading, Content, Error pattern for auth store
 import { writable } from "svelte/store";
-import type { User, AuthState } from "../types/models";
+import type { User, AuthState } from "../schema/auth_schema";
 
 // Initial authentication state
 const initialState: AuthState = {

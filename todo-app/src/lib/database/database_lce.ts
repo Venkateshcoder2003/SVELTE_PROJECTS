@@ -1,6 +1,5 @@
 import { writable } from "svelte/store";
-import { browser } from "$app/environment";
-import type { Todo } from "../models";
+import type { Todo } from "../schema/todo_schema";
 
 // Initial todos state
 const initialState = {
@@ -39,9 +38,7 @@ const existingTodoTitles = new Set<string>();
 
 todosStore.subscribe((todos) => {
   existingTodoTitles.clear();
-  todos.forEach((todo) =>
-    existingTodoTitles.add(todo.title.toLowerCase())
-  );
+  todos.forEach((todo) => existingTodoTitles.add(todo.title.toLowerCase()));
 });
 
 export const isDuplicateTodo = (title: string): boolean => {

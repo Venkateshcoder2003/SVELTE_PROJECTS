@@ -3,7 +3,7 @@
   import Navigation from '$lib/components/Navigation.svelte';
 
   //Import authentication store
-  import { authStore } from '$lib/utils/auth_lce';
+  import { authStore } from '$lib/authentication/auth_lce';
   import { Toaster } from 'svelte-sonner';
 </script>
 <Toaster richColors /> 

@@ -1,12 +1,12 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { updateTodo } from '$lib/stores/todos';
+  import { updateTodo } from '$lib/database/database';
   import type { Todo } from '$lib/types';
-  import Button from './Button.svelte';
-  import InputField from './InputField.svelte';
-  import TextAreaField from './TextAreaField.svelte';
-  import FileUploadField from './FileUploadField.svelte';
-  import ErrorDisplay from './ErrorDisplay.svelte';
+  import Button from '$lib/components/Button.svelte';
+  import InputField from '$lib/components/InputField.svelte';
+  import TextAreaField from '$lib/components/TextAreaField.svelte';
+  import FileUploadField from '$lib/components/FileUploadField.svelte';
+  import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
   import { onMount, onDestroy } from 'svelte';
 
   export let todo: Todo;
@@ -103,7 +103,7 @@
 </script>
 
 <div class="select-none space-y-3 flex flex-col h-full">
-  
+  <!-- Reusable Input, textarea and FileUpload fields -->
   <InputField
     id="edit-title-{todo.id}"
     label="Title"

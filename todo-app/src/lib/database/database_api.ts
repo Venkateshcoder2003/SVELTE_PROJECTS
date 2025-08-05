@@ -19,8 +19,8 @@ import {
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
-import { db, storage } from "./firebase";
-import type { Todo } from "../types/models";
+import { db, storage } from "../utils/firebase";
+import type { Todo } from "../schema/todo_schema";
 
 // Subscribe to user's todos
 export const subscribeToTodos = (

@@ -1,5 +1,5 @@
 //Import all required modules
-export { todosStore, todosLoading, todosError } from "../utils/todos_lce";
+export { todosStore, todosLoading, todosError } from "./database_lce";
 
 // Export all todo actions
 export {
@@ -10,4 +10,4 @@ export {
   deleteTodo,
   deleteAllTodos,
   updateTodo,
-} from "../utils/todos_actions"
+} from "./database_actions";

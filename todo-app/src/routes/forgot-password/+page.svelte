@@ -1,11 +1,11 @@
 <script lang="ts">
   //Import required modules
   import { goto } from '$app/navigation';
-  import { forgotPassword } from '$lib/stores/auth';
+  import { forgotPassword } from '$lib/authentication/auth_actions';
   import InputField from '$lib/components/InputField.svelte';
   import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
   import Button from '$lib/components/Button.svelte';
-  import { validateForgotPasswordForm } from '$lib/validation';
+  import { validateForgotPasswordForm } from '$lib/utils/validation';
 
   let email = '';
   let isSubmitting = false;

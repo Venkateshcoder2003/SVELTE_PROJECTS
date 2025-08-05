@@ -5,7 +5,7 @@ import {
   sendPasswordResetEmail,
   type User as FirebaseUser,
 } from "firebase/auth";
-import { auth } from "./firebase";
+import { auth } from "../utils/firebase";
 
 // A utility function to create a new user
 export const signUpUser = async (

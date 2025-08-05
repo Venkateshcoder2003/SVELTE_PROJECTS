@@ -35,6 +35,7 @@
   }
 </script>
 
+<!--Textarea field-->
 <div class="flex flex-col">
   <!-- Label and character count row -->
   <div class="flex justify-between items-center mb-2">

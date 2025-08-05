@@ -1,4 +1,3 @@
-<!-- InputField.svelte - Improved Version -->
 <script lang="ts">
   export let id: string;
   export let type: string = 'text';
@@ -32,28 +31,25 @@
   }
 </script>
 
-<div>
-  <div class="flex justify-between items-center mb-2">
-    <label for={id} class="select-none block text-sm font-medium text-gray-700">
+<div class="flex flex-col mb-4">
+  <!-- Label and Character Count on Same Line -->
+  <div class="flex justify-between items-center mb-1">
+    <label for={id} class="select-none text-sm font-medium text-gray-700">
       {#if icon}<span>{@html icon}</span>{/if}
       {label}
       {#if required}<span class="text-red-500">*</span>{/if}
     </label>
+    
     {#if extraLink}
       <a href={extraLink.href} class="select-none text-xs sm:text-sm text-blue-500 hover:underline font-medium">
         {extraLink.text}
       </a>
-    {/if}
-  </div>
-  
-  <!-- Character count for input -->
-  {#if showCharCount}
-    <div class="flex justify-end mb-1">
+    {:else if showCharCount}
       <div 
         class="select-none text-xs" 
-        class:text-red-500={remainingChars < 0} 
-        class:text-yellow-500={remainingChars < 50 && remainingChars >= 0} 
-        class:text-gray-500={remainingChars >= 50}
+        class:text-red-500={remainingChars <= 0} 
+        class:text-yellow-500={remainingChars < 3 && remainingChars > 0} 
+        class:text-gray-500={remainingChars >= 3}
       >
         {#if remainingChars <= 0}
           Max characters reached
@@ -61,8 +57,8 @@
           {remainingChars} characters remaining
         {/if}
       </div>
-    </div>
-  {/if}
+    {/if}
+  </div>
   
   <div class="relative">
     <input
@@ -76,7 +72,7 @@
       {required}
       {disabled}
       {placeholder}
-      class="text-gray-700 focus:text-gray-500 focus:outline-none  focus:bg-gray-50 focus:ring-blue-500 w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-1"
+      class="w-full px-4 py-2 focus:bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
       class:border-red-300={!isValidInput && value.length > 0}
       class:border-green-300={isValidInput}
     />

@@ -1,9 +1,9 @@
 <script lang="ts">
+  // Import store
   export let todosStore: any;
   export let todosLoading: boolean;
 </script>
 
-<!-- Displays the stats of todos (Pending, Completed) -->
 {#if !todosLoading && $todosStore.length > 0}
   <div class="mt-10 grid grid-cols-3 gap-2 sm:gap-4">
     <div class="bg-indigo-50 border border-blue-200 rounded-lg p-4 text-center">

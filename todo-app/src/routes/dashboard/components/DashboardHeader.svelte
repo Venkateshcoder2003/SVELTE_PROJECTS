@@ -2,7 +2,7 @@
   <div>
     <h1 class="select-none text-3xl font-bold text-gray-800">
       <span>&#x1F4DD;</span>
-        Todo Dashboard
+      Todo Dashboard
     </h1>
   </div>
 </div>

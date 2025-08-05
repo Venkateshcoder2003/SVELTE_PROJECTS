@@ -7,6 +7,7 @@
   $: spinnerSize = size === 'small' ? 'h-4 w-4' : size === 'medium' ? 'h-8 w-8' : 'h-12 w-12';
 </script>
 
+<!--Custom Spinner-->
 {#if showContainer}
   <div class={containerClass}>
     <div class="animate-spin rounded-full {spinnerSize} border-b-2 border-{color}"></div>

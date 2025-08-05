@@ -1,4 +1,5 @@
 <script lang="ts">
+  // Import required modules
   import { createEventDispatcher } from 'svelte';
   
   export let todosStore: any;
