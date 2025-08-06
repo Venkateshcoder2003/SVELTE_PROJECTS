@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secure Cloud File Storage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f1f1f1;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #111;
+        }
+
+        .card {
+            background: #fff;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        input[type="file"],
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 20px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .message {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Secure Cloud File Storage</h1>
+
+    <div class="card">
+        <h2>Upload File</h2>
+        <input type="file" id="uploadFile" />
+        <button onclick="uploadFile()">Upload</button>
+        <div id="uploadMessage" class="message"></div>
+    </div>
+
+    <div class="card">
+        <h2>Download File</h2>
+        <input type="text" id="downloadFilename" placeholder="Enter filename to download" />
+        <button onclick="downloadFile()">Download</button>
+        <div id="downloadMessage" class="message"></div>
+    </div>
+
+    <script>
+        function uploadFile() {
+            const fileInput = document.getElementById('uploadFile');
+            const file = fileInput.files[0];
+            const message = document.getElementById('uploadMessage');
+
+            if (!file) {
+                message.textContent = 'Please select a file to upload.';
+                return;
+            }
+
+            const url = https://5f8r6e2b5g.execute-api.eu-north-1.amazonaws.com/prod/upload?filename=${encodeURIComponent(file.name)};
+
+            fetch(url, {
+                method: 'POST',
+                body: file
+            })
+                .then(response => {
+                    if (response.ok) {
+                        message.textContent = 'File uploaded successfully!';
+                    } else {
+                        message.textContent = 'Upload failed.';
+                    }
+                })
+                .catch(() => {
+                    message.textContent = 'Upload failed due to a network error.';
+                });
+        }
+
+        function downloadFile() {
+            const filename = document.getElementById('downloadFilename').value.trim();
+            const message = document.getElementById('downloadMessage');
+
+            if (!filename) {
+                message.textContent = 'Please enter a filename.';
+                return;
+            }
+
+            const url = https://5f8r6e2b5g.execute-api.eu-north-1.amazonaws.com/prod/download?filename=${encodeURIComponent(filename)};
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('File not found');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename;
+                    link.click();
+                    message.textContent = 'Download started.';
+                })
+                .catch(error => {
+                    message.textContent = 'Download failed: ' + error.message;
+                });
+        }
+    </script>
+</body>
+
+</html>
